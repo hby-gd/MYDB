@@ -17,7 +17,7 @@ import top.guoziyang.mydb.common.Error;
 
 public class Launcher {
 
-    public static final int port = 9999;
+    public static final int port = 19999;
 
     public static final long DEFALUT_MEM = (1<<20)*64;
     public static final long KB = 1 << 10;
