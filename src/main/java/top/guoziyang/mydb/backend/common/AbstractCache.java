@@ -27,6 +27,7 @@ public abstract class AbstractCache<T> {
         lock = new ReentrantLock();
     }
 
+
     protected T get(long key) throws Exception {
         while(true) {
             lock.lock();

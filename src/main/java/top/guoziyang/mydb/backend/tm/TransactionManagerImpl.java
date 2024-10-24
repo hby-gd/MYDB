@@ -11,6 +11,11 @@ import top.guoziyang.mydb.backend.utils.Panic;
 import top.guoziyang.mydb.backend.utils.Parser;
 import top.guoziyang.mydb.common.Error;
 
+/**
+ * 用来维护一个 .xid 文件
+ * 来记录各个事务的状态
+ *
+ */
 public class TransactionManagerImpl implements TransactionManager {
 
     // XID文件头长度
@@ -27,8 +32,11 @@ public class TransactionManagerImpl implements TransactionManager {
     public static final long SUPER_XID = 0;
 
     static final String XID_SUFFIX = ".xid";
-    
+
+    // 随机访问文件
     private RandomAccessFile file;
+
+    // NIO中的文件IO工具
     private FileChannel fc;
     private long xidCounter;
     private Lock counterLock;
