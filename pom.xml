@@ -8,10 +8,11 @@
   <name>MyDB</name>
   <url>http://maven.apache.org</url>
 
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -24,7 +25,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>31.0.1-jre</version>
+      <version>32.0.1-jre</version>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -42,4 +43,22 @@
       <version>1.5.0</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.0.0</version> <!-- 指定你需要的版本 -->
+        <configuration>
+          <mainClass>top.guoziyang.mydb.backend.Launcher</mainClass>
+<!--          <arguments>-->
+<!--            <argument>-open</argument>-->
+<!--            <argument>D:/mydb</argument>-->
+<!--          </arguments>-->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
