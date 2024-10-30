@@ -45,6 +45,7 @@ public class DataItemImpl implements DataItem {
 
     @Override
     public SubArray data() {
+        // 返回 DataItem中的 Data内容
         return new SubArray(raw.raw, raw.start+OF_DATA, raw.end);
     }
 
@@ -52,11 +53,13 @@ public class DataItemImpl implements DataItem {
     public void before() {
         wLock.lock();
         pg.setDirty(true);
+        // 保存原始数据副本
         System.arraycopy(raw.raw, raw.start, oldRaw, 0, oldRaw.length);
     }
 
     @Override
     public void unBefore() {
+        // 恢复原始数据
         System.arraycopy(oldRaw, 0, raw.raw, raw.start, oldRaw.length);
         wLock.unlock();
     }

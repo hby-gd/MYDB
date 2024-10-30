@@ -28,9 +28,13 @@ public interface DataItem {
     byte[] getOldRaw();
     SubArray getRaw();
 
+    // 原始数据包装为 DataItem raw数据
     public static byte[] wrapDataItemRaw(byte[] raw) {
+        // 标记不合法
         byte[] valid = new byte[1];
+        // 计算长度信息
         byte[] size = Parser.short2Byte((short)raw.length);
+        // 三者拼接得到 DataItem raw数据
         return Bytes.concat(valid, size, raw);
     }
 

@@ -18,6 +18,11 @@ public interface Logger {
     void rewind();
     void close();
 
+    /**
+     * 创建日志
+     * @param path
+     * @return
+     */
     public static Logger create(String path) {
         File f = new File(path+LoggerImpl.LOG_SUFFIX);
         try {
@@ -52,6 +57,11 @@ public interface Logger {
         return new LoggerImpl(raf, fc, 0);
     }
 
+    /**
+     * 打开日志文件
+     * @param path
+     * @return
+     */
     public static Logger open(String path) {
         File f = new File(path+LoggerImpl.LOG_SUFFIX);
         if(!f.exists()) {

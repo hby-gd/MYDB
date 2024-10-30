@@ -118,6 +118,10 @@ public class PageCacheImpl extends AbstractCache<Page> implements PageCache {
         flush(pg);
     }
 
+    /**
+     * 将 page内容持久化至磁盘中
+     * @param pg
+     */
     private void flush(Page pg) {
         int pgno = pg.getPageNumber();
         long offset = pageOffset(pgno);
@@ -135,6 +139,10 @@ public class PageCacheImpl extends AbstractCache<Page> implements PageCache {
         }
     }
 
+    /**
+     * 清除 maxPgno后页面的内容，并更新文件长度，更新页面数量
+     * @param maxPgno
+     */
     public void truncateByBgno(int maxPgno) {
         long size = pageOffset(maxPgno + 1);
         try {

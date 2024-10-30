@@ -31,6 +31,12 @@ public class DataManagerImpl extends AbstractCache<DataItem> implements DataMana
         this.pIndex = new PageIndex();
     }
 
+    /**
+     * 通过uid 从缓存中读获取 DateItem，校验后返回
+     * @param uid
+     * @return
+     * @throws Exception
+     */
     @Override
     public DataItem read(long uid) throws Exception {
         DataItemImpl di = (DataItemImpl)super.get(uid);
@@ -41,14 +47,27 @@ public class DataManagerImpl extends AbstractCache<DataItem> implements DataMana
         return di;
     }
 
+    /**
+     *
+     * @param xid
+     * @param data
+     * @return
+     * @throws Exception
+     */
     @Override
     public long insert(long xid, byte[] data) throws Exception {
+        // 将原始数据包装为 DataItem的raw数据
         byte[] raw = DataItem.wrapDataItemRaw(data);
+
+        // 数据长度超过页空间
         if(raw.length > PageX.MAX_FREE_SPACE) {
             throw Error.DataTooLargeException;
         }
 
+        // 初始化页数据
         PageInfo pi = null;
+
+        // 寻找能容纳 raw 数据的页面
         for(int i = 0; i < 5; i++) {
             pi = pIndex.select(raw.length);
             if (pi != null) {
@@ -62,16 +81,24 @@ public class DataManagerImpl extends AbstractCache<DataItem> implements DataMana
             throw Error.DatabaseBusyException;
         }
 
+        // 初始化页面对象
         Page pg = null;
         int freeSpace = 0;
         try {
+            // 页面对象 引用 缓存中的对应页
             pg = pc.getPage(pi.pgno);
+
+            // 构建日志并持久化至磁盘
             byte[] log = Recover.insertLog(xid, pg, raw);
             logger.log(log);
 
+            // 将页面数据插入页面，并返回偏移量
             short offset = PageX.insert(pg, raw);
 
+            // 释放页面，写入磁盘
             pg.release();
+
+            // 返回数据项的唯一标识 uid
             return Types.addressToUid(pi.pgno, offset);
 
         } finally {
@@ -84,6 +111,9 @@ public class DataManagerImpl extends AbstractCache<DataItem> implements DataMana
         }
     }
 
+    /**
+     * 关闭缓存和日志，并更新管理页状态
+     */
     @Override
     public void close() {
         super.close();
@@ -104,15 +134,28 @@ public class DataManagerImpl extends AbstractCache<DataItem> implements DataMana
         super.release(di.getUid());
     }
 
+    /**
+     * 从 uid 解析 页码及偏移量，从缓存中取出数据，再构建 DataItem
+     * @param uid
+     * @return
+     * @throws Exception
+     */
     @Override
     protected DataItem getForCache(long uid) throws Exception {
         short offset = (short)(uid & ((1L << 16) - 1));
         uid >>>= 32;
         int pgno = (int)(uid & ((1L << 32) - 1));
+        // 通过页面编号拿到Page对象
         Page pg = pc.getPage(pgno);
+        // 通过偏移量，从page中解析 DataItem对象
         return DataItem.parseDataItem(pg, offset, this);
     }
 
+    /**
+     * 释放缓存，将DataItem内容写回磁盘
+     * 文件的读写是以页为单位的，只需要将 DataItem所在的页释放即可
+     * @param di
+     */
     @Override
     protected void releaseForCache(DataItem di) {
         di.page().release();

@@ -57,6 +57,11 @@ public class LoggerImpl implements Logger {
         lock = new ReentrantLock();
     }
 
+    /**
+     * 初始化日志
+     * 校验日志正确性
+     *
+     */
     void init() {
         long size = 0;
         try {

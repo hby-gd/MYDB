@@ -34,6 +34,11 @@ public class PageIndex {
         }
     }
 
+    /**
+     * 根据给定空间选择一个 PageInfo对象
+     * @param spaceSize 所需空间大小
+     * @return  一个PageInfo对象，其空闲空间大于等于所需空间，若找不到返回null
+     */
     public PageInfo select(int spaceSize) {
         lock.lock();
         try {

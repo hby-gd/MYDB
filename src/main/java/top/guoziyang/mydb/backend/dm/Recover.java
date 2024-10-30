@@ -77,6 +77,12 @@ public class Recover {
         System.out.println("Recovery Over.");
     }
 
+    /**
+     * 重复执行事务
+     * @param tm
+     * @param lg
+     * @param pc
+     */
     private static void redoTranscations(TransactionManager tm, Logger lg, PageCache pc) {
         lg.rewind();
         while(true) {
@@ -150,6 +156,12 @@ public class Recover {
     private static final int OF_UPDATE_UID = OF_XID+8;
     private static final int OF_UPDATE_RAW = OF_UPDATE_UID+8;
 
+    /**
+     * 创建一个更新日志
+     * @param xid   事务ID
+     * @param di    DataItem对象
+     * @return      返回 log数组  [[操作类型]+[事务]+[DataItem唯一标识]+[旧数据]+[新数据]]
+     */
     public static byte[] updateLog(long xid, DataItem di) {
         byte[] logType = {LOG_TYPE_UPDATE};
         byte[] xidRaw = Parser.long2Byte(xid);
@@ -160,6 +172,11 @@ public class Recover {
         return Bytes.concat(logType, xidRaw, uidRaw, oldRaw, newRaw);
     }
 
+    /**
+     * 解析更新日志数组
+     * @param log
+     * @return 解析得到更新日志信息对象，包含 事务ID、页码、偏移量、旧数据、新数据
+     */
     private static UpdateLogInfo parseUpdateLog(byte[] log) {
         UpdateLogInfo li = new UpdateLogInfo();
         li.xid = Parser.parseLong(Arrays.copyOfRange(log, OF_XID, OF_UPDATE_UID));
@@ -206,6 +223,13 @@ public class Recover {
     private static final int OF_INSERT_OFFSET = OF_INSERT_PGNO+4;
     private static final int OF_INSERT_RAW = OF_INSERT_OFFSET+2;
 
+    /**
+     * 构建日志数组文件
+     * @param xid   事务Id
+     * @param pg    页面对象
+     * @param raw   页面数据
+     * @return      返回 log数组  [[事务]+[页码]+[偏移量]+[页面数据]]
+     */
     public static byte[] insertLog(long xid, Page pg, byte[] raw) {
         byte[] logTypeRaw = {LOG_TYPE_INSERT};
         byte[] xidRaw = Parser.long2Byte(xid);
