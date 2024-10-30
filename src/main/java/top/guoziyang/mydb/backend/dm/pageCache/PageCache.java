@@ -22,6 +22,12 @@ public interface PageCache {
     int getPageNumber();
     void flushPage(Page pg);
 
+    /**
+     * 根据路径和内存大小来构建页面缓存
+     * @param path
+     * @param memory
+     * @return
+     */
     public static PageCacheImpl create(String path, long memory) {
         File f = new File(path+PageCacheImpl.DB_SUFFIX);
         try {
@@ -46,6 +52,12 @@ public interface PageCache {
         return new PageCacheImpl(raf, fc, (int)memory/PAGE_SIZE);
     }
 
+    /**
+     * 打开指定路径的内容，作为缓存文件
+     * @param path
+     * @param memory
+     * @return
+     */
     public static PageCacheImpl open(String path, long memory) {
         File f = new File(path+PageCacheImpl.DB_SUFFIX);
         if(!f.exists()) {

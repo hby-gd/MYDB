@@ -5,7 +5,7 @@ public class SubArray {
     public int start;
     public int end;
 
-    public SubArray(byte[] raw, int start, int end) {
+        public SubArray(byte[] raw, int start, int end) {
         this.raw = raw;
         this.start = start;
         this.end = end;

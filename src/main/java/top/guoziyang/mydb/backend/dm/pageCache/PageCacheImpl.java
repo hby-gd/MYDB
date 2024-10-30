@@ -25,6 +25,12 @@ public class PageCacheImpl extends AbstractCache<Page> implements PageCache {
 
     private AtomicInteger pageNumbers;
 
+    /**
+     * 创建页面缓存
+     * @param file
+     * @param fileChannel
+     * @param maxResource
+     */
     PageCacheImpl(RandomAccessFile file, FileChannel fileChannel, int maxResource) {
         super(maxResource);
         if(maxResource < MEM_MIN_LIM) {
@@ -42,6 +48,11 @@ public class PageCacheImpl extends AbstractCache<Page> implements PageCache {
         this.pageNumbers = new AtomicInteger((int)length / PAGE_SIZE);
     }
 
+    /**
+     * 新建一个页面，并将 initData 作为内容，写入磁盘，并返回页面编号
+     * @param initData
+     * @return
+     */
     public int newPage(byte[] initData) {
         int pgno = pageNumbers.incrementAndGet();
         Page pg = new PageImpl(pgno, initData, null);
@@ -49,12 +60,22 @@ public class PageCacheImpl extends AbstractCache<Page> implements PageCache {
         return pgno;
     }
 
+    /**
+     * 从缓存中获取指定页面标号的页面
+     * @param pgno  页面编号
+     * @return  指定页面的内容
+     * @throws Exception
+     */
     public Page getPage(int pgno) throws Exception {
         return get((long)pgno);
     }
 
+
     /**
      * 根据pageNumber从数据库文件中读取页数据，并包裹成Page
+     * @param key
+     * @return Page包装的指定页数据
+     * @throws Exception
      */
     @Override
     protected Page getForCache(long key) throws Exception {
@@ -73,6 +94,10 @@ public class PageCacheImpl extends AbstractCache<Page> implements PageCache {
         return new PageImpl(pgno, buf.array(), this);
     }
 
+    /**
+     * 将修改过的缓存内容写入磁盘文件中
+     * @param pg
+     */
     @Override
     protected void releaseForCache(Page pg) {
         if(pg.isDirty()) {
@@ -81,6 +106,10 @@ public class PageCacheImpl extends AbstractCache<Page> implements PageCache {
         }
     }
 
+    /**
+     * 将指定页面的缓存内容写入磁盘
+     * @param page
+     */
     public void release(Page page) {
         release((long)page.getPageNumber());
     }

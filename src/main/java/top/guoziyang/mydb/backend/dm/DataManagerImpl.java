@@ -49,7 +49,7 @@ public class DataManagerImpl extends AbstractCache<DataItem> implements DataMana
         }
 
         PageInfo pi = null;
-        for(int i = 0; i < 5; i ++) {
+        for(int i = 0; i < 5; i++) {
             pi = pIndex.select(raw.length);
             if (pi != null) {
                 break;
