@@ -107,7 +107,7 @@ public class PageCacheImpl extends AbstractCache<Page> implements PageCache {
     }
 
     /**
-     * 将指定页面的缓存内容写入磁盘
+     * 将指定页面的缓存内容写入磁盘，并更新当前缓存引用计数状态
      * @param page
      */
     public void release(Page page) {

@@ -114,6 +114,7 @@ public class LoggerImpl implements Logger {
         rewind();
     }
 
+    // 计算 单条日志 校验码
     private int calChecksum(int xCheck, byte[] log) {
         for (byte b : log) {
             xCheck = xCheck * SEED + b;
@@ -121,6 +122,7 @@ public class LoggerImpl implements Logger {
         return xCheck;
     }
 
+    // 写入日志
     @Override
     public void log(byte[] data) {
         byte[] log = wrapLog(data);
@@ -137,6 +139,7 @@ public class LoggerImpl implements Logger {
         updateXChecksum(log);
     }
 
+    // 更新日志全局标识位
     private void updateXChecksum(byte[] log) {
         this.xChecksum = calChecksum(this.xChecksum, log);
         try {
@@ -148,6 +151,7 @@ public class LoggerImpl implements Logger {
         }
     }
 
+    // 原始数据包装为日志数据 [[size][check][data]]
     private byte[] wrapLog(byte[] data) {
         byte[] checksum = Parser.int2Byte(calChecksum(0, data));
         byte[] size = Parser.int2Byte(data.length);

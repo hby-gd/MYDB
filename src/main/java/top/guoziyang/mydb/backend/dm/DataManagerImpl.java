@@ -32,7 +32,7 @@ public class DataManagerImpl extends AbstractCache<DataItem> implements DataMana
     }
 
     /**
-     * 通过uid 从缓存中读获取 DateItem，校验后返回
+     * 通过uid 从缓存中读获取 DateItem，校验(判断是否删除)后返回
      * @param uid
      * @return
      * @throws Exception
@@ -48,7 +48,7 @@ public class DataManagerImpl extends AbstractCache<DataItem> implements DataMana
     }
 
     /**
-     *
+     * 执行插入操作：事务 mid 将 原始数据 data 插入数据库
      * @param xid
      * @param data
      * @return

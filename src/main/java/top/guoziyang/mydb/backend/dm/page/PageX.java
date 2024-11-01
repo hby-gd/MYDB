@@ -33,7 +33,7 @@ public class PageX {
     }
 
     private static short getFSO(byte[] raw) {
-        return Parser.parseShort(Arrays.copyOfRange(raw, 0, 2));
+        return Parser.parseShort(Arrays.copyOfRange(raw, OF_FREE, OF_DATA));
     }
 
     // 将raw插入pg中，返回插入位置
