@@ -65,8 +65,10 @@ public class LockTable {
     public void remove(long xid) {
         lock.lock();
         try {
+            // 获取当前事务拿到的资源列表
             List<Long> l = x2u.get(xid);
             if(l != null) {
+                // 遍历释放所有资源
                 while(l.size() > 0) {
                     Long uid = l.remove(0);
                     selectNewXID(uid);
