@@ -11,7 +11,7 @@ import top.guoziyang.mydb.backend.utils.Parser;
 /**
  * VM向上层抽象出entry
  * entry结构：
- * [XMIN] [XMAX] [data]
+ * [XMIN] [XMAX] [data]    创建entry的事务、删除该entry的事务，entry数据
  */
 public class Entry {
 
@@ -39,6 +39,13 @@ public class Entry {
         return newEntry(vm, di, uid);
     }
 
+    /**
+     * 将原始数据包装为 entry的raw数据 [xmin][xmax][data]
+     *
+     * @param xid   事务ID
+     * @param data  原始数据
+     * @return  包装后的raw数据
+     */
     public static byte[] wrapEntryRaw(long xid, byte[] data) {
         byte[] xmin = Parser.long2Byte(xid);
         byte[] xmax = new byte[8];
@@ -66,6 +73,7 @@ public class Entry {
         }
     }
 
+    // 获取创建 entry 的事务ID
     public long getXmin() {
         dataItem.rLock();
         try {
@@ -76,6 +84,7 @@ public class Entry {
         }
     }
 
+    // 获取删除entry 的事务ID
     public long getXmax() {
         dataItem.rLock();
         try {
@@ -86,12 +95,15 @@ public class Entry {
         }
     }
 
+    // 设置删除 entry 的事务ID
     public void setXmax(long xid) {
+        // 拷贝旧值
         dataItem.before();
         try {
             SubArray sa = dataItem.data();
             System.arraycopy(Parser.long2Byte(xid), 0, sa.raw, sa.start+OF_XMAX, 8);
         } finally {
+            // 写入修改日志
             dataItem.after(xid);
         }
     }

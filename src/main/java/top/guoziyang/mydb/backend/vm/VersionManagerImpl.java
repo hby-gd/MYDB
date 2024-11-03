@@ -74,9 +74,9 @@ public class VersionManagerImpl extends AbstractCache<Entry> implements VersionM
 
     /**
      * 事务 xid 插入数据，返回dm中数据项uid
-     * @param xid
-     * @param data
-     * @return
+     * @param xid   事务ID
+     * @param data  插入的原始数据
+     * @return  数据项UID
      * @throws Exception
      */
     @Override
@@ -99,9 +99,9 @@ public class VersionManagerImpl extends AbstractCache<Entry> implements VersionM
 
     /**
      * 删除Entry 数据项
-     * @param xid
-     * @param uid
-     * @return
+     * @param xid   事务ID
+     * @param uid   数据项ID
+     * @return      数据项是否被删除
      * @throws Exception
      */
     @Override
@@ -147,7 +147,7 @@ public class VersionManagerImpl extends AbstractCache<Entry> implements VersionM
                 l.unlock();
             }
 
-            // 判断当前
+            // 判断数据项是否被当前事务删除
             if(entry.getXmax() == xid) {
                 return false;
             }
