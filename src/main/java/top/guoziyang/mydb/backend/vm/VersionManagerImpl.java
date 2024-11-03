@@ -152,6 +152,7 @@ public class VersionManagerImpl extends AbstractCache<Entry> implements VersionM
                 return false;
             }
 
+            // 发生版本跳跃时，当前事务回滚
             if(Visibility.isVersionSkip(tm, t, entry)) {
                 t.err = Error.ConcurrentUpdateException;
                 internAbort(xid, true);
