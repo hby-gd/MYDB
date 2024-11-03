@@ -131,7 +131,7 @@ public class VersionManagerImpl extends AbstractCache<Entry> implements VersionM
             }
             Lock l = null;
             try {
-                // 对当前数据项加锁，并获取到该锁
+                // 试对数据项（由 uid 指定）加锁，同时与事务（由 xid 指定）建立持有关系。
                 l = lt.add(xid, uid);
             } catch(Exception e) {
                 t.err = Error.ConcurrentUpdateException;
