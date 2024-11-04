@@ -8,6 +8,11 @@ import top.guoziyang.mydb.common.Error;
 
 public class Encoder {
 
+    /**
+     * 将pkg编码为字节数组，通过首字节判断是err还是data
+     * @param pkg
+     * @return
+     */
     public byte[] encode(Package pkg) {
         if(pkg.getErr() != null) {
             Exception err = pkg.getErr();
@@ -21,6 +26,12 @@ public class Encoder {
         }
     }
 
+    /**
+     * 将 data 解析为 pkg
+     * @param data
+     * @return
+     * @throws Exception
+     */
     public Package decode(byte[] data) throws Exception {
         if(data.length < 1) {
             throw Error.InvalidPkgDataException;

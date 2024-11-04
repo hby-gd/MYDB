@@ -1,5 +1,8 @@
 package top.guoziyang.mydb.transport;
 
+/**
+ * C-S 通信格式
+ */
 public class Package {
     byte[] data;
     Exception err;

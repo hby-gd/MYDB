@@ -34,7 +34,7 @@ public class BPlusTree {
     }
 
     /**
-     *
+     *  加载一个 B+树
      * @param bootUid  B+树的唯一启动表示符
      * @param dm    数据管理器
      * @return  返回一颗 B+树
@@ -149,7 +149,7 @@ public class BPlusTree {
     }
 
     /**
-     *
+     * 获取 leftKey 与 rightKey 间的所有节点 uid 信息
      * @param leftKey
      * @param rightKey
      * @return

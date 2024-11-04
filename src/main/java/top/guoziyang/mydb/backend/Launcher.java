@@ -43,6 +43,10 @@ public class Launcher {
         System.out.println("Usage: launcher (open|create) DBPath");
     }
 
+    /**
+     * 创建数据库
+     * @param path
+     */
     private static void createDB(String path) {
         TransactionManager tm = TransactionManager.create(path);
         DataManager dm = DataManager.create(path, DEFALUT_MEM, tm);
@@ -52,6 +56,11 @@ public class Launcher {
         dm.close();
     }
 
+    /**
+     * 启动数据库服务端
+     * @param path
+     * @param mem
+     */
     private static void openDB(String path, long mem) {
         TransactionManager tm = TransactionManager.open(path);
         DataManager dm = DataManager.open(path, mem, tm);
@@ -60,6 +69,11 @@ public class Launcher {
         new Server(port, tbm).start();
     }
 
+    /**
+     * 解析容量大小
+     * @param memStr
+     * @return
+     */
     private static long parseMem(String memStr) {
         if(memStr == null || "".equals(memStr)) {
             return DEFALUT_MEM;

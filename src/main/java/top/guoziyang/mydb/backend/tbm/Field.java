@@ -27,14 +27,22 @@ public class Field {
     private long index;
     private BPlusTree bt;
 
+    /**
+     * 从磁盘中加载一个字段对象
+     * @param tb
+     * @param uid
+     * @return
+     */
     public static Field loadField(Table tb, long uid) {
         byte[] raw = null;
         try {
+            // 从磁盘中读取 字段的字节数据
             raw = ((TableManagerImpl)tb.tbm).vm.read(TransactionManagerImpl.SUPER_XID, uid);
         } catch (Exception e) {
             Panic.panic(e);
         }
         assert raw != null;
+        // 新建字段，并解析字段属性
         return new Field(uid, tb).parseSelf(raw);
     }
 
@@ -50,6 +58,11 @@ public class Field {
         this.index = index;
     }
 
+    /**
+     * 从字节数据解析字段对象
+     * @param raw
+     * @return
+     */
     private Field parseSelf(byte[] raw) {
         int position = 0;
         ParseStringRes res = Parser.parseString(raw);
@@ -61,6 +74,7 @@ public class Field {
         this.index = Parser.parseLong(Arrays.copyOfRange(raw, position, position+8));
         if(index != 0) {
             try {
+                // 加载 B+树 索引
                 bt = BPlusTree.load(index, ((TableManagerImpl)tb.tbm).dm);
             } catch(Exception e) {
                 Panic.panic(e);
@@ -69,19 +83,33 @@ public class Field {
         return this;
     }
 
+    /**
+     * 创建一个字段对象
+     * @param tb
+     * @param xid
+     * @param fieldName
+     * @param fieldType
+     * @param indexed
+     * @return
+     * @throws Exception
+     */
     public static Field createField(Table tb, long xid, String fieldName, String fieldType, boolean indexed) throws Exception {
-        typeCheck(fieldType);
+        typeCheck(fieldType);   // 检查字段类型是否合法
         Field f = new Field(tb, fieldName, fieldType, 0);
+        // 判断字段是否加了索引
         if(indexed) {
+            //创建一个 B+数 索引并加载该索引
             long index = BPlusTree.create(((TableManagerImpl)tb.tbm).dm);
             BPlusTree bt = BPlusTree.load(index, ((TableManagerImpl)tb.tbm).dm);
             f.index = index;
             f.bt = bt;
         }
+        // 持久化字段对象
         f.persistSelf(xid);
         return f;
     }
 
+    // 持久化字段对象并设置字段的uid
     private void persistSelf(long xid) throws Exception {
         byte[] nameRaw = Parser.string2Byte(fieldName);
         byte[] typeRaw = Parser.string2Byte(fieldType);
@@ -104,6 +132,13 @@ public class Field {
         bt.insert(uKey, uid);
     }
 
+    /**
+     * 从字段对象的 B+树 索引中 获取范围内的所有节点 uid 信息
+     * @param left
+     * @param right
+     * @return
+     * @throws Exception
+     */
     public List<Long> search(long left, long right) throws Exception {
         return bt.searchRange(left, right);
     }
@@ -157,6 +192,11 @@ public class Field {
         int shift;
     }
 
+    /**
+     * 根据字段类型解析 字符数组
+     * @param raw
+     * @return
+     */
     public ParseValueRes parserValue(byte[] raw) {
         ParseValueRes res = new ParseValueRes();
         switch(fieldType) {
@@ -204,16 +244,23 @@ public class Field {
             .toString();
     }
 
+    /**
+     * 根据条件计算符条件的 范围
+     * @param exp
+     * @return
+     * @throws Exception
+     */
     public FieldCalRes calExp(SingleExpression exp) throws Exception {
         Object v = null;
         FieldCalRes res = new FieldCalRes();
         switch(exp.compareOp) {
+            // 小于
             case "<":
                 res.left = 0;
-                v = string2Value(exp.value);
-                res.right = value2Uid(v);
+                v = string2Value(exp.value);    // 将字符串值转换为对象值
+                res.right = value2Uid(v);       // 将对象值转换为 UID
                 if(res.right > 0) {
-                    res.right --;
+                    res.right --;   // 如果右边界大于0，则右边界减1
                 }
                 break;
             case "=":

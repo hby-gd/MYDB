@@ -34,6 +34,11 @@ public class Parser {
         return ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(value).array();
     }
 
+    /**
+     * 从字节数组中解析字符串内容，以及下一个需要解析的位置
+     * @param raw
+     * @return
+     */
     public static ParseStringRes parseString(byte[] raw) {
         int length = parseInt(Arrays.copyOf(raw, 4));
         String str = new String(Arrays.copyOfRange(raw, 4, 4+length));

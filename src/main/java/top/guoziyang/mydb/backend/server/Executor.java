@@ -30,9 +30,17 @@ public class Executor {
         }
     }
 
+    /**
+     * 执行 sql，返回结果
+     * @param sql
+     * @return
+     * @throws Exception
+     */
     public byte[] execute(byte[] sql) throws Exception {
         System.out.println("Execute: " + new String(sql));
         Object stat = Parser.Parse(sql);
+
+        // 判断 stat 类型，执行不同操作
         if(Begin.class.isInstance(stat)) {
             if(xid != 0) {
                 throw Error.NestedTransactionException;
@@ -59,6 +67,12 @@ public class Executor {
         }
     }
 
+    /**
+     * 执行 数据库 增删改查 sql
+     * @param stat
+     * @return
+     * @throws Exception
+     */
     private byte[] execute2(Object stat) throws Exception {
         boolean tmpTransaction = false;
         Exception e = null;
