@@ -18,14 +18,22 @@ import top.guoziyang.mydb.backend.parser.statement.Where;
 import top.guoziyang.mydb.common.Error;
 
 public class Parser {
+    /**
+     * 使用 Tokenizer 分割 Token，并根据语法规则将 Token 包装为 Statement类
+     * @param statement
+     * @return
+     * @throws Exception
+     */
     public static Object Parse(byte[] statement) throws Exception {
         Tokenizer tokenizer = new Tokenizer(statement);
+        // 拿到第一个字符串，并设置tokenizer状态
         String token = tokenizer.peek();
         tokenizer.pop();
 
-        Object stat = null;
-        Exception statErr = null;
+        Object stat = null; // 用于存储生成的语句对象
+        Exception statErr = null;   // 用于存储错误信息
         try {
+            // 根据第一个字符串内容来执行解析
             switch(token) {
                 case "begin":
                     stat = parseBegin(tokenizer);
@@ -61,10 +69,11 @@ public class Parser {
                     throw Error.InvalidCommandException;
             }
         } catch(Exception e) {
-            statErr = e;
+            statErr = e;// 如果在解析过程中出现错误，保存错误信息
         }
         try {
             String next = tokenizer.peek();
+            // 语句解析完成还有未处理字符，视为语法异常
             if(!"".equals(next)) {
                 byte[] errStat = tokenizer.errStat();
                 statErr = new RuntimeException("Invalid statement: " + new String(errStat));
@@ -90,31 +99,38 @@ public class Parser {
 
     private static Update parseUpdate(Tokenizer tokenizer) throws Exception {
         Update update = new Update();
+        // 表名
         update.tableName = tokenizer.peek();
         tokenizer.pop();
 
+        // update xx_tb set ... = ....
         if(!"set".equals(tokenizer.peek())) {
             throw Error.InvalidCommandException;
         }
         tokenizer.pop();
 
+        // 获取字段名
         update.fieldName = tokenizer.peek();
         tokenizer.pop();
 
+        // update xx_tb set ... = ....
         if(!"=".equals(tokenizer.peek())) {
             throw Error.InvalidCommandException;
         }
         tokenizer.pop();
 
+        // 获取值
         update.value = tokenizer.peek();
         tokenizer.pop();
 
+        // 判断当前语句是否结束
         String tmp = tokenizer.peek();
         if("".equals(tmp)) {
             update.where = null;
             return update;
         }
 
+        // 解析 where 条件
         update.where = parseWhere(tokenizer);
         return update;
     }
@@ -219,6 +235,13 @@ public class Parser {
         return read;
     }
 
+    /**
+     * 最多支持两个条件查询，且条件查询仅支持 比较符，
+     * 两条件间关系支持 and 和 or
+     * @param tokenizer
+     * @return
+     * @throws Exception
+     */
     private static Where parseWhere(Tokenizer tokenizer) throws Exception {
         Where where = new Where();
 
@@ -250,6 +273,7 @@ public class Parser {
         return where;
     }
 
+
     private static SingleExpression parseSingleExp(Tokenizer tokenizer) throws Exception {
         SingleExpression exp = new SingleExpression();
         
@@ -261,6 +285,7 @@ public class Parser {
         tokenizer.pop();
 
         String op = tokenizer.peek();
+        // 仅支持 > < =
         if(!isCmpOp(op)) {
             throw Error.InvalidCommandException;
         }
@@ -272,10 +297,20 @@ public class Parser {
         return exp;
     }
 
+    /**
+     * 判断是否为比较符号
+     * @param op
+     * @return
+     */
     private static boolean isCmpOp(String op) {
         return ("=".equals(op) || ">".equals(op) || "<".equals(op));
     }
 
+    /**
+     * 判断是否为 and or
+     * @param op
+     * @return
+     */
     private static boolean isLogicOp(String op) {
         return ("and".equals(op) || "or".equals(op));
     }
@@ -351,6 +386,8 @@ public class Parser {
         create.fieldType = fTypes.toArray(new String[fTypes.size()]);
 
         tokenizer.pop();
+
+        // 必须建立索引，仅支持索引查询
         if(!"index".equals(tokenizer.peek())) {
             throw Error.InvalidCommandException;
         }
@@ -377,6 +414,11 @@ public class Parser {
         return create;
     }
 
+    /**
+     * 仅支持 int32、int64、string三种类型
+     * @param tp
+     * @return
+     */
     private static boolean isType(String tp) {
         return ("int32".equals(tp) || "int64".equals(tp) ||
         "string".equals(tp));
@@ -444,6 +486,11 @@ public class Parser {
         }
     }
 
+    /**
+     * 判断是否为字段名或表名
+     * @param name  长度大于1且以字母为首字符
+     * @return
+     */
     private static boolean isName(String name) {
         return !(name.length() == 1 && !Tokenizer.isAlphaBeta(name.getBytes()[0]));
     }
